@@ -42,9 +42,7 @@ def home_page():
 
 @app.route("/api/v1.0/precipitation")
 def precipitation():
-    # Create our session (link) from Python to the DB
-    session = Session(engine)
-
+   
     """Convert the query results to a dictionary using date as the key and prcp as the value"""
     # Query measurement tables 
     year_ago = dt.date(2017, 8, 23) - dt.timedelta(days=365)
@@ -57,14 +55,12 @@ def precipitation():
         rain_dict["prcp"] = prcp
         rain.append(rain_dict)
 
-
     # Return data as json
     return jsonify(rain)
 
 @app.route("/api/v1.0/stations")
 def stations():
    
-
     """Return a JSON list of stations from the dataset"""
     all_stations = session.query(Stations.station).all()
 
@@ -74,14 +70,12 @@ def stations():
         st_dic["station"] = station
         st_list.append(st_dic)
 
-
     # Return data as json
     return jsonify(st_list)
 
 @app.route("/api/v1.0/tobs")
 def tobs():
     
-
     """Query the dates and temperature observations of the most active station for the last year of data."""
     year_ago = dt.date(2017, 8, 23) - dt.timedelta(days=365)
     last_year_tobs = session.query(Meas.date, Meas.tobs).filter(Meas.station == 'USC00519281').filter(Meas.date >= year_ago).all()
@@ -93,13 +87,11 @@ def tobs():
         temp_obs_dic["tobs"] = tobs
         temp_obs_list.append(temp_obs_dic)
 
-
     # Return data as json
     return jsonify(temp_obs_list)
 
 @app.route("/api/v1.0/start")
 def start():
-    
 
     """When given the start only, calculate TMIN, TAVG, and TMAX for all dates greater than and equal to the start date"""
     results = session.query(func.min(Meas.tobs), func.max(Meas.tobs), func.avg(Meas.tobs)).filter(Meas.date >= '2017-08-23').all()
@@ -111,7 +103,6 @@ def start():
         data_dict["TMAX"] = TMAX
         data_dict["TAVG"] = TAVG
         data.append(data_dict)
-
     
     # Return data as json
     return jsonify(data)
@@ -119,7 +110,6 @@ def start():
 @app.route("/api/v1.0/start-end")
 def start_end():
     
-
     """When given the start and the end date, calculate the TMIN, TAVG, and TMAX for dates between the start and end date inclusive."""
     year_ago = dt.date(2017, 8, 23) - dt.timedelta(days=365)
     period_results = session.query(func.min(Meas.tobs), func.max(Meas.tobs), func.avg(Meas.tobs)).filter(Meas.date >= year_ago).all()
@@ -131,7 +121,6 @@ def start_end():
         period_data_dict["TMAX"] = TMAX
         period_data_dict["TAVG"] = TAVG
         period_data.append(period_data_dict)
-
 
     # Return data as json
     return jsonify(period_data)
